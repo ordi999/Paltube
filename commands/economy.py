@@ -24,7 +24,7 @@ def create_eco(user, eco):
 class Economy(discord.ext.commands.Cog):
 	""" Toutes les commandes en rapport avec l'économie """
 	# permet de récupérer les informations utile pour les commandes
-	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation):
+	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation):
 		self.bot = bot
 		self.eco = eco
 		self.prefix = prefix
@@ -32,6 +32,8 @@ class Economy(discord.ext.commands.Cog):
 		self.work_activation = work_activation
 		self.pay_activation = pay_activation
 		self.bet_activation = bet_activation
+		self.daily_activation = daily_activation
+		self.add_money_activation = add_money_activation
 	# commande bal pour savoir son solde ou celui de quelqu'un
 	@discord.ext.commands.command(
 	name="bal",
@@ -205,12 +207,14 @@ class Economy(discord.ext.commands.Cog):
 			# Si on tente de se donner de l'argent
 			if user == author:
 				# on prévient que c'est impossible
-				await ctx.message.reply("Tu ne peux pas te donner de l'argent à toi-même")
+				await ctx.message.reply("Tu ne peux pas te donner de l'argent à toi-même",delete_after = 5)	
+				await ctx.message.delete(delay = 2)
 				return
 			# si la somme est négative ou nulle
 			if amount <= 0:
 				# on prévient que c'est impossible
-				await ctx.message.reply("Il faut mettre une somme valide")
+				await ctx.message.reply("Il faut mettre une somme valide",delete_after = 5)	
+				await ctx.message.delete(delay = 2)
 				return
 			# on stock le dictionnaire contenant les infos de l'utilisateur
 			check = self.eco.find_one({"id": author.id})
@@ -244,11 +248,12 @@ class Economy(discord.ext.commands.Cog):
 				self.eco.update_one({"id": user.id}, {"$set": {"money": balance2 + amount}})
 
 				# on fait un message pour dire que le paiement a été réussi
-				em = discord.Embed(
+				embed = discord.Embed(
 					title = "Paiement réussi 🤑",
 					description = f"Vous avez donné **{amount}€** à **{user.mention}** !  🎉",
-					color = discord.Colour.random())
-				await ctx.message.reply(embed=em)
+					color = discord.Colour.random(),timestamp = datetime.utcnow())
+				embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+				await ctx.message.reply(embed=embed)
 				return
 
 			# si l'utilisateur n'a pas asser d'argent
@@ -401,78 +406,90 @@ class Economy(discord.ext.commands.Cog):
 		brief="Permet de gagner de l'argent tous les jours, si vous l'utilisez plusieurs jours consécutif, vous gagnerez plus d'argent !",
 		help="Permet de gagner de l'argent tous les jours, si vous l'utilisez plusieurs jours consécutif, vous gagnerez plus d'argent !") 
 	async def daily(self,ctx):
-		# on récupère l'utilisateur
-		user = ctx.author
+		if self.daily_activation:
+			# on récupère l'utilisateur
+			user = ctx.author
 
-		# on stock le dictionnaire contenant les infos de l'utilisateur
-		check = self.eco.find_one({"id": user.id})
-		
-		# si l'utilisateur n'a pas de compte
-		if check is None:
-			# on lui en fait un
-			create_eco(user,self.eco)
+			# on stock le dictionnaire contenant les infos de l'utilisateur
 			check = self.eco.find_one({"id": user.id})
-		
-		# on récupère son solde
-		balance = check['money']
+			
+			# si l'utilisateur n'a pas de compte
+			if check is None:
+				# on lui en fait un
+				create_eco(user,self.eco)
+				check = self.eco.find_one({"id": user.id})
+			
+			# on récupère son solde
+			balance = check['money']
 
-		# on récupère son daily_streak
-		streak = check["daily_streak"]
-		# on récupère la dernière fois qu'il a utilisé la commande
-		last_daily = check["last_daily"]
-		# on récupère son meilleur daily-streak
-		best = check["best_daily_streak"]
+			# on récupère son daily_streak
+			streak = check["daily_streak"]
+			# on récupère la dernière fois qu'il a utilisé la commande
+			last_daily = check["last_daily"]
+			# on récupère son meilleur daily-streak
+			best = check["best_daily_streak"]
 
-		# on récupère la date actuelle
-		now = datetime.fromtimestamp(float(str(datetime.now().timestamp())))
+			# on récupère la date actuelle
+			now = datetime.fromtimestamp(float(str(datetime.now().timestamp())))
 
-		# on regarde s'il n'a pas fait son daily streak à temps
-		if now-last_daily > timedelta(hours=48):
-			# dans ce cas on reset son daily_streak
-			streak = 1
-		# Sinon s'il tente de la refaire avant la fin du cooldown / PS : On utilise pas le cooldown de discord car si le bot est redémaré le cooldown est reset
-		elif now-last_daily < timedelta(hours=24):
-			# on récupère le temps en seconde restant
-			temps = (24*60*60) - (now-last_daily).total_seconds()
-			# on regarde si c'est un temps en heure si oui on le convertit
-			if(temps/3600 <=24 and temps/3600>=1):
-				temps = str(int(temps/3600)) + " heures et " + str(int((temps%3600)/60)) + " minutes"
-			# on regarde si c'est un temps en minutes si oui on le convertit
-			elif(temps/60 <60 and temps/60>=1):
-				temps = str(int(temps/60)) + " minutes et " + str(int(temps%60)) + " secondes"
+			# on regarde s'il n'a pas fait son daily streak à temps
+			if now-last_daily > timedelta(hours=48):
+				# dans ce cas on reset son daily_streak
+				streak = 1
+			# Sinon s'il tente de la refaire avant la fin du cooldown / PS : On utilise pas le cooldown de discord car si le bot est redémaré le cooldown est reset
+			elif now-last_daily < timedelta(hours=24):
+				# on récupère le temps en seconde restant
+				temps = (24*60*60) - (now-last_daily).total_seconds()
+				# on regarde si c'est un temps en heure si oui on le convertit
+				if(temps/3600 <=24 and temps/3600>=1):
+					temps = str(int(temps/3600)) + " heures et " + str(int((temps%3600)/60)) + " minutes"
+				# on regarde si c'est un temps en minutes si oui on le convertit
+				elif(temps/60 <60 and temps/60>=1):
+					temps = str(int(temps/60)) + " minutes et " + str(int(temps%60)) + " secondes"
+				else:
+				# sinon c'est un temps en seconde, on le convertit
+					temps =  str(int(temps)) + " secondes"
+				# on prévient qu'il y a encore un cooldown
+				await ctx.message.reply(f"Il y a un cooldown, veuillez encore attendre {temps}", delete_after = 5)
+				await ctx.message.delete(delay = 2)
+				# on stop la fonction ici
+				return
+			# sinon si l'utilisateur a respecté le délai du daily_streak
 			else:
-			# sinon c'est un temps en seconde, on le convertit
-				temps =  str(int(temps)) + " secondes"
-			# on prévient qu'il y a encore un cooldown
-			await ctx.message.reply(f"Il y a un cooldown, veuillez encore attendre {temps}", delete_after = 5)
-			await ctx.message.delete(delay = 2)
-			# on stop la fonction ici
-			return
-		# sinon si l'utilisateur a respecté le délai du daily_streak
+				# on augmente son daily_streak de 1
+				streak += 1
+			# si son daily streak est supérieur
+			if streak > best:
+				# on sauvegarde le nouveau meilleur daily streak
+				best = streak
+				# on l'update
+				self.eco.update_one({"id": user.id}, {"$set": {"best_daily_streak": best}})
+			
+			# on calcule la récompense
+			daily = 45 + (streak * 5)
+
+			# on update les données
+			self.eco.update_one({"id": user.id}, {"$set": {"money": balance + daily}})
+			self.eco.update_one({"id": user.id}, {"$set": {"daily_streak": streak}})
+			self.eco.update_one({"id": user.id}, {"$set": {"last_daily": now}})
+
+			# on prévient l'utilisateur qu'il a recu son daily streak
+			embed=discord.Embed(title="__Daily reward__", description=f"Vous avez récupéré votre récompense de **{daily}€** et vous avez atteint un combo de **{streak} jours** d'affilés !", color=discord.Colour.green(),timestamp = datetime.utcnow())
+			embed.add_field(name="__Meilleur combo__", value=f"Votre meilleur combo est de **{best} jours** d'affilés !", inline=False)
+			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			await ctx.message.add_reaction("✅")
+			await ctx.message.reply(embed=embed)
 		else:
-			# on augmente son daily_streak de 1
-			streak += 1
-		# si son daily streak est supérieur
-		if streak > best:
-			# on sauvegarde le nouveau meilleur daily streak
-			best = streak
-			# on l'update
-			self.eco.update_one({"id": user.id}, {"$set": {"best_daily_streak": best}})
-		
-		# on calcule la récompense
-		daily = 45 + (streak * 5)
-
-		# on update les données
-		self.eco.update_one({"id": user.id}, {"$set": {"money": balance + daily}})
-		self.eco.update_one({"id": user.id}, {"$set": {"daily_streak": streak}})
-		self.eco.update_one({"id": user.id}, {"$set": {"last_daily": now}})
-
-		# on prévient l'utilisateur qu'il a recu son daily streak
-		embed=discord.Embed(title="__Daily reward__", description=f"Vous avez récupéré votre récompense de **{daily}€** et vous avez atteint un combo de **{streak} jours** d'affilés !", color=discord.Colour.green(),timestamp = datetime.utcnow())
-		embed.add_field(name="__Meilleur combo__", value=f"Votre meilleur combo est de **{best} jours** d'affilés !", inline=False)
-		embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
-		await ctx.message.add_reaction("✅")
-		await ctx.message.reply(embed=embed)
+			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **daily** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **daily_activation** à True au lieu de False 😉", inline=False)
+			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			# on ajoute une réaction au message de l'utilisateur
+			await ctx.message.add_reaction("❌")
+			# on envoit le embed
+			await ctx.send(embed=embed, delete_after=10)
+			await ctx.message.delete(delay = 2)
 	
 	@daily.error
 	async def daily_error(self,ctx, error):
@@ -481,6 +498,78 @@ class Economy(discord.ext.commands.Cog):
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help daily **", inline=False)
 		embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+		# on ajoute une réaction au message de l'utilisateur
+		await ctx.message.add_reaction("❌")
+		# on envoit le embed
+		await ctx.send(embed=embed, delete_after=5)
+		await ctx.message.delete(delay = 2)
+
+	@discord.ext.commands.command(
+		name="add_money",
+		brief="Permet d'ajouter de l'argent à quelqu'un ! (nécéssite la permission de kick)",
+		help="Permet d'ajouter de l'argent à quelqu'un ! (nécéssite la permission de kick)")
+	@discord.ext.commands.has_permissions(kick_members=True)
+	async def add_money(self,ctx,user: discord.Member, amount:int):
+		# si la commande est activée
+		if self.add_money_activation:
+			
+			# si la somme est négative ou nulle
+			if amount <= 0:
+				# on prévient que c'est impossible
+				await ctx.message.reply("Il faut mettre une somme valide", delete_after = 5)	
+				await ctx.message.delete(delay = 2)
+				return
+
+			# on stock le dictionnaire contenant les infos de l'utilisateur
+			check = self.eco.find_one({"id": user.id})
+			
+			# si l'utilisateur n'a pas de compte
+			if check is None:
+				# on lui fait un compte
+				create_eco(user,self.eco)
+				check = self.eco.find_one({"id": user.id})
+			
+			balance = check["money"]
+
+			# on met à jour son solde sur la database
+			self.eco.update_one({"id": user.id}, {"$set": {"money": balance + amount}})
+			
+			# on envoie un message pour lui dire combien il a gagné
+			embed = discord.Embed(
+				title = "__Réussite__",
+				description = f"Vous avez bien rajouté **{amount}€** sur le compte de {user.mention} !",
+				color = discord.Colour.random(),timestamp = datetime.utcnow()
+			)
+			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			await ctx.message.reply(embed=embed)
+			return
+		else:
+			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **add_money** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **add_money_activation** à True au lieu de False 😉", inline=False)
+			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			# on ajoute une réaction au message de l'utilisateur
+			await ctx.message.add_reaction("❌")
+			# on envoit le embed
+			await ctx.send(embed=embed, delete_after=10)
+			await ctx.message.delete(delay = 2)
+	@add_money.error
+	async def add_money_error(self,ctx, error): 
+		#on vérifie si c'est un manque de permission, si oui, on crée un embed
+		if isinstance(error, discord.ext.commands.MissingPermissions):
+			embed=discord.Embed(title="__ERREUR__", description="Vous avez besoin de la permission de **kick** !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un mauvais argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.BadArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre un **utilisateur** valide !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un manque d'argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.MissingRequiredArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre le **bon** nombre d'argument(s) !", color=0xff1a1a,timestamp = datetime.utcnow())
+		else:
+			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
+		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help add_money **", inline=False)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
