@@ -3,6 +3,13 @@
 ## [Futur Changement]
 Voir commande -commands du bot
 
+## 2022-02-04
+### Ajout
+- commande bug : permet de report un bug au dev
+### Changement
+- supression du cooldown de discord pour la commande daily (quand on redémarait le bot, le cooldown était reset)
+- remplacement du cooldown de discord par mon propre cooldown (commande daily)
+
 ## 2022-02-03
 ### Ajout
 - commande daily : permet de récupérer de l'argent chaque jours (augmente en fonction du nombre de jours consécutifs) avec un cooldown de 24H

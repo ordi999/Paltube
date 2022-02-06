@@ -14,7 +14,7 @@ def create_eco(user, eco):
 			"tags": user.discriminator,
 			"money": 10,
 			"daily_streak": 0,
-			"last_daily": datetime.fromtimestamp(float(str(datetime.now().timestamp()))),
+			"last_daily": datetime.fromtimestamp(float(str(datetime.now().timestamp()))) - timedelta(days = 1),
 			"best_daily_streak":0
 		}
 		eco.insert_one(insert)
@@ -400,41 +400,74 @@ class Economy(discord.ext.commands.Cog):
 		name="daily",
 		brief="Permet de gagner de l'argent tous les jours, si vous l'utilisez plusieurs jours consécutif, vous gagnerez plus d'argent !",
 		help="Permet de gagner de l'argent tous les jours, si vous l'utilisez plusieurs jours consécutif, vous gagnerez plus d'argent !") 
-	@discord.ext.commands.cooldown(1, 60*60*24, discord.ext.commands.BucketType.user)
 	async def daily(self,ctx):
+		# on récupère l'utilisateur
 		user = ctx.author
 
 		# on stock le dictionnaire contenant les infos de l'utilisateur
 		check = self.eco.find_one({"id": user.id})
 		
-
-
 		# si l'utilisateur n'a pas de compte
 		if check is None:
 			# on lui en fait un
 			create_eco(user,self.eco)
 			check = self.eco.find_one({"id": user.id})
 		
+		# on récupère son solde
 		balance = check['money']
 
+		# on récupère son daily_streak
 		streak = check["daily_streak"]
+		# on récupère la dernière fois qu'il a utilisé la commande
 		last_daily = check["last_daily"]
+		# on récupère son meilleur daily-streak
 		best = check["best_daily_streak"]
 
+		# on récupère la date actuelle
 		now = datetime.fromtimestamp(float(str(datetime.now().timestamp())))
+
+		# on regarde s'il n'a pas fait son daily streak à temps
 		if now-last_daily > timedelta(hours=48):
+			# dans ce cas on reset son daily_streak
 			streak = 1
+		# Sinon s'il tente de la refaire avant la fin du cooldown / PS : On utilise pas le cooldown de discord car si le bot est redémaré le cooldown est reset
+		elif now-last_daily < timedelta(hours=24):
+			# on récupère le temps en seconde restant
+			temps = (24*60*60) - (now-last_daily).total_seconds()
+			# on regarde si c'est un temps en heure si oui on le convertit
+			if(temps/3600 <=24 and temps/3600>=1):
+				temps = str(int(temps/3600)) + " heures et " + str(int((temps%3600)/60)) + " minutes"
+			# on regarde si c'est un temps en minutes si oui on le convertit
+			elif(temps/60 <60 and temps/60>=1):
+				temps = str(int(temps/60)) + " minutes et " + str(int(temps%60)) + " secondes"
+			else:
+			# sinon c'est un temps en seconde, on le convertit
+				temps =  str(int(temps)) + " secondes"
+			# on prévient qu'il y a encore un cooldown
+			await ctx.message.reply(f"Il y a un cooldown, veuillez encore attendre {temps}", delete_after = 5)
+			await ctx.message.delete(delay = 2)
+			# on stop la fonction ici
+			return
+		# sinon si l'utilisateur a respecté le délai du daily_streak
 		else:
+			# on augmente son daily_streak de 1
 			streak += 1
+		# si son daily streak est supérieur
 		if streak > best:
+			# on sauvegarde le nouveau meilleur daily streak
 			best = streak
+			# on l'update
 			self.eco.update_one({"id": user.id}, {"$set": {"best_daily_streak": best}})
+		
+		# on calcule la récompense
 		daily = 45 + (streak * 5)
 
+		# on update les données
 		self.eco.update_one({"id": user.id}, {"$set": {"money": balance + daily}})
 		self.eco.update_one({"id": user.id}, {"$set": {"daily_streak": streak}})
 		self.eco.update_one({"id": user.id}, {"$set": {"last_daily": now}})
 
+		# on prévient l'utilisateur qu'il a recu son daily streak
 		embed=discord.Embed(title="__Daily reward__", description=f"Vous avez récupéré votre récompense de **{daily}€** et vous avez atteint un combo de **{streak} jours** d'affilés !", color=discord.Colour.green(),timestamp = datetime.utcnow())
 		embed.add_field(name="__Meilleur combo__", value=f"Votre meilleur combo est de **{best} jours** d'affilés !", inline=False)
 		embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
@@ -443,22 +476,10 @@ class Economy(discord.ext.commands.Cog):
 	
 	@daily.error
 	async def daily_error(self,ctx, error):
-		# si c'est à cause du cooldown
-		if isinstance(error, discord.ext.commands.CommandOnCooldown):
-			temps = int(error.retry_after)
-			if(temps/3600 <=24 and temps/3600>=1):
-				temps = str(int(temps/3600)) + " heures et " + str(int((temps%3600)/60)) + " minutes"
-			elif(temps/60 <60 and temps/60>=1):
-				temps = str(int(temps/60)) + " minutes et " + str(int(temps%60)) + " secondes"
-			else:
-				temps =  str(int(temps)) + " secondes"
-			await ctx.message.reply(f"Il y a un cooldown, veuillez encore attendre {temps}", delete_after = 5)
-			await ctx.message.delete(delay = 2)
-			return
-		else:
-			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
+		# on crée l'erreur
+		embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
-		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help work **", inline=False)
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help daily **", inline=False)
 		embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")

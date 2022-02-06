@@ -56,3 +56,46 @@ class Autres(discord.ext.commands.Cog):
 		# on envoit le embed
 		await ctx.send(embed=embed, delete_after=5)
 		await ctx.message.delete(delay = 2)
+	
+	@discord.ext.commands.command(
+	name="bug",
+	brief="A utiliser si vous avez un bug avec une des commandes ou avec le bot en lui-même !",
+	help="A utiliser si vous avez un bug avec une des commandes ou avec le bot en lui-même !")
+	async def bug(self, ctx,*, reason):
+		# on récupère mon objet user
+		ordi999 = self.bot.get_user(260469844456112128)
+
+		# on fait un embed
+		embed=discord.Embed(title="__Rapport de Bug__", description=f"**ID**: {ctx.author.id}\n**Pseudo**: {ctx.author.name}\n**Tags**: #{ctx.author.discriminator}\n**Mention**: {ctx.author.mention}", color=0xff1a1a,timestamp = datetime.utcnow())
+
+		embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+
+		embed.add_field(name="Description:", value=reason, inline=False)
+		
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+
+		# on envoit le embed à ordi999
+		await ordi999.send(embed=embed)
+
+		# on envoie un message à l'utilisateur pour le remercié
+		await ctx.message.reply("Merci, votre rapport de bug a bien été pris en compte ! 👍")
+	
+	#s'il y a une erreur lors de la commande bug
+	@bug.error
+	async def bug_error(self,ctx, error): 
+		#sinon on vérifie si c'est un mauvais argument, si oui, on crée un embed
+		if isinstance(error, discord.ext.commands.BadArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre un **utilisateur** valide !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un manque d'argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.MissingRequiredArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre le **bon** nombre d'argument(s) !", color=0xff1a1a,timestamp = datetime.utcnow())
+		else:
+			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
+		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help bug **", inline=False)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		# on ajoute une réaction au message de l'utilisateur
+		await ctx.message.add_reaction("❌")
+		# on envoit le embed
+		await ctx.send(embed=embed, delete_after=5)
+		await ctx.message.delete(delay = 2)
