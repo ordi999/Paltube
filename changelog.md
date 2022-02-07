@@ -7,6 +7,7 @@ Voir commande -commands du bot
 ### Ajout
 - commande remove_money : Permet aux utilisateurs possédant la permission de kick de retirer de l'argent au solde de quelqu'un
 - commande set_money : Permet aux utilisateurs possédant la permission de kick de définir le solde de quelqu'un
+- commande get_all_data : Permet aux utilisateurs possédant la permission de kick de savoir toutes les informations contenu dans la base de données à propos de quelqu'un
 
 ## 2022-02-06
 ### Ajout

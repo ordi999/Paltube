@@ -24,7 +24,7 @@ def create_eco(user, eco):
 class Economy(discord.ext.commands.Cog):
 	""" Toutes les commandes en rapport avec l'économie """
 	# permet de récupérer les informations utile pour les commandes
-	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation):
+	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation,get_all_data_activation):
 		self.bot = bot
 		self.eco = eco
 		self.prefix = prefix
@@ -36,6 +36,7 @@ class Economy(discord.ext.commands.Cog):
 		self.add_money_activation = add_money_activation
 		self.remove_money_activation = remove_money_activation
 		self.set_money_activation = set_money_activation
+		self.get_all_data_activation = get_all_data_activation
 	# commande bal pour savoir son solde ou celui de quelqu'un
 	@discord.ext.commands.command(
 	name="bal",
@@ -713,6 +714,69 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help set_money **", inline=False)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		# on ajoute une réaction au message de l'utilisateur
+		await ctx.message.add_reaction("❌")
+		# on envoit le embed
+		await ctx.send(embed=embed, delete_after=5)
+		await ctx.message.delete(delay = 2)
+
+	@discord.ext.commands.command(
+		name="get_all_data",
+		brief="Permet de récupérer toutes les informations de quelqu'un ! (nécéssite la permission de kick)",
+		help="Permet de récupérer toutes les informations de quelqu'un ! (nécéssite la permission de kick)")
+	@discord.ext.commands.has_permissions(kick_members=True)
+	async def get_all_data(self,ctx,user: discord.Member):
+		# si la commande est activée
+		if self.get_all_data_activation:
+			
+			# on stock le dictionnaire contenant les infos de l'utilisateur
+			check = self.eco.find_one({"id": user.id})
+			
+			# si l'utilisateur n'a pas de compte
+			if check is None:
+				# on lui fait un compte
+				create_eco(user,self.eco)
+				check = self.eco.find_one({"id": user.id})
+
+			embed = discord.Embed(
+				title = f"__Information de {user}__",
+				color = discord.Colour.random(),timestamp = datetime.utcnow()
+			)
+			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+
+			for elt in check:
+				embed.add_field(name=f"**{elt}**", value=check[elt], inline=False)
+			
+			await ctx.message.reply(embed=embed)
+			return
+		else:
+			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **get_all_data** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **get_all_data_activation** à True au lieu de False 😉", inline=False)
+			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			# on ajoute une réaction au message de l'utilisateur
+			await ctx.message.add_reaction("❌")
+			# on envoit le embed
+			await ctx.send(embed=embed, delete_after=10)
+			await ctx.message.delete(delay = 2)
+	
+	@get_all_data.error
+	async def get_all_data_error(self,ctx, error): 
+		#on vérifie si c'est un manque de permission, si oui, on crée un embed
+		if isinstance(error, discord.ext.commands.MissingPermissions):
+			embed=discord.Embed(title="__ERREUR__", description="Vous avez besoin de la permission de **kick** afin d'ajouter de l'argent !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un mauvais argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.BadArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre un **utilisateur** valide !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un manque d'argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.MissingRequiredArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre le **bon** nombre d'argument(s) !", color=0xff1a1a,timestamp = datetime.utcnow())
+		else:
+			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
+		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help get_all_data **", inline=False)
 		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")

@@ -41,6 +41,7 @@ daily_activation = True
 add_money_activation = True
 remove_money_activation = True
 set_money_activation = True
+get_all_data_activation = True
 
 #Tous les status que vas prendre le bot
 status = cycle([
@@ -100,7 +101,7 @@ bot.add_cog(moderation.Moderation(bot,kick_activation,delete_activation,prefix))
 
 bot.add_cog(autres.Autres(bot,prefix,commands_activation))
 
-bot.add_cog(economy.Economy(bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation,remove_money_activation,set_money_activation))
+bot.add_cog(economy.Economy(bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation,remove_money_activation,set_money_activation,get_all_data_activation))
 
 bot.add_cog(zone_de_test.Zone_de_test(bot,prefix, dice_activation))
 
