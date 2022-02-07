@@ -3,9 +3,14 @@
 ## [Futur Changement]
 Voir commande -commands du bot
 
+## 2022-02-07
+### Ajout
+- commande remove_money : Permet aux utilisateurs possédant la permission de kick de retirer de l'argent au solde de quelqu'un
+- commande set_money : Permet aux utilisateurs possédant la permission de kick de définir le solde de quelqu'un
+
 ## 2022-02-06
 ### Ajout
-- Commande add_money : Permet aux utilisateur possédant la permission de kick d'ajouter de l'argent au solde de quelqu'un
+- Commande add_money : Permet aux utilisateurs possédant la permission de kick d'ajouter de l'argent au solde de quelqu'un
 
 ## 2022-02-04
 ### Ajout

@@ -24,7 +24,7 @@ def create_eco(user, eco):
 class Economy(discord.ext.commands.Cog):
 	""" Toutes les commandes en rapport avec l'économie """
 	# permet de récupérer les informations utile pour les commandes
-	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation):
+	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation):
 		self.bot = bot
 		self.eco = eco
 		self.prefix = prefix
@@ -34,6 +34,8 @@ class Economy(discord.ext.commands.Cog):
 		self.bet_activation = bet_activation
 		self.daily_activation = daily_activation
 		self.add_money_activation = add_money_activation
+		self.remove_money_activation = remove_money_activation
+		self.set_money_activation = set_money_activation
 	# commande bal pour savoir son solde ou celui de quelqu'un
 	@discord.ext.commands.command(
 	name="bal",
@@ -558,7 +560,7 @@ class Economy(discord.ext.commands.Cog):
 	async def add_money_error(self,ctx, error): 
 		#on vérifie si c'est un manque de permission, si oui, on crée un embed
 		if isinstance(error, discord.ext.commands.MissingPermissions):
-			embed=discord.Embed(title="__ERREUR__", description="Vous avez besoin de la permission de **kick** !", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed=discord.Embed(title="__ERREUR__", description="Vous avez besoin de la permission de **kick** afin d'ajouter de l'argent !", color=0xff1a1a,timestamp = datetime.utcnow())
 		#sinon on vérifie si c'est un mauvais argument, si oui, on crée un embed
 		elif isinstance(error, discord.ext.commands.BadArgument):
 			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre un **utilisateur** valide !", color=0xff1a1a,timestamp = datetime.utcnow())
@@ -569,6 +571,148 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help add_money **", inline=False)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		# on ajoute une réaction au message de l'utilisateur
+		await ctx.message.add_reaction("❌")
+		# on envoit le embed
+		await ctx.send(embed=embed, delete_after=5)
+		await ctx.message.delete(delay = 2)
+
+	@discord.ext.commands.command(
+		name="remove_money",
+		brief="Permet de retirer de l'argent à quelqu'un ! (nécéssite la permission de kick)",
+		help="Permet de retirer de l'argent à quelqu'un ! (nécéssite la permission de kick)")
+	@discord.ext.commands.has_permissions(kick_members=True)
+	async def remove_money(self,ctx,user: discord.Member, amount:int):
+		# si la commande est activée
+		if self.remove_money_activation:
+			
+			# on stock le dictionnaire contenant les infos de l'utilisateur
+			check = self.eco.find_one({"id": user.id})
+			
+			# si l'utilisateur n'a pas de compte
+			if check is None:
+				# on lui fait un compte
+				create_eco(user,self.eco)
+				check = self.eco.find_one({"id": user.id})
+			
+			balance = check["money"]
+
+			# si la somme finale est négative ou nulle
+			if balance - amount < 0:
+				# on prévient que c'est impossible
+				await ctx.message.reply("L'utilisateur ne peut pas avoir un solde négatif !", delete_after = 5)	
+				await ctx.message.delete(delay = 2)
+				return
+
+			# on met à jour son solde sur la database
+			self.eco.update_one({"id": user.id}, {"$set": {"money": balance - amount}})
+			
+			# on envoie un message pour lui dire combien il a gagné
+			embed = discord.Embed(
+				title = "__Réussite__",
+				description = f"Vous avez bien retiré **{amount}€** du compte de {user.mention} !",
+				color = discord.Colour.random(),timestamp = datetime.utcnow()
+			)
+			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			await ctx.message.reply(embed=embed)
+			return
+		else:
+			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **remove_money** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **remove_money_activation** à True au lieu de False 😉", inline=False)
+			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			# on ajoute une réaction au message de l'utilisateur
+			await ctx.message.add_reaction("❌")
+			# on envoit le embed
+			await ctx.send(embed=embed, delete_after=10)
+			await ctx.message.delete(delay = 2)
+	@remove_money.error
+	async def remove_money_error(self,ctx, error): 
+		#on vérifie si c'est un manque de permission, si oui, on crée un embed
+		if isinstance(error, discord.ext.commands.MissingPermissions):
+			embed=discord.Embed(title="__ERREUR__", description="Vous avez besoin de la permission de **kick** afin d'ajouter de l'argent !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un mauvais argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.BadArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre un **utilisateur** valide !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un manque d'argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.MissingRequiredArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre le **bon** nombre d'argument(s) !", color=0xff1a1a,timestamp = datetime.utcnow())
+		else:
+			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
+		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help remove_money **", inline=False)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		# on ajoute une réaction au message de l'utilisateur
+		await ctx.message.add_reaction("❌")
+		# on envoit le embed
+		await ctx.send(embed=embed, delete_after=5)
+		await ctx.message.delete(delay = 2)
+
+	@discord.ext.commands.command(
+		name="set_money",
+		brief="Permet de définir le solde de quelqu'un ! (nécéssite la permission de kick)",
+		help="Permet de définir le solde de quelqu'un ! (nécéssite la permission de kick)")
+	@discord.ext.commands.has_permissions(kick_members=True)
+	async def set_money(self,ctx,user: discord.Member, amount:int):
+		# si la commande est activée
+		if self.remove_money_activation:
+			
+			# on stock le dictionnaire contenant les infos de l'utilisateur
+			check = self.eco.find_one({"id": user.id})
+			
+			# si l'utilisateur n'a pas de compte
+			if check is None:
+				# on lui fait un compte
+				create_eco(user,self.eco)
+				check = self.eco.find_one({"id": user.id})
+
+			# si la somme finale est négative ou nulle
+			if amount < 0:
+				# on prévient que c'est impossible
+				await ctx.message.reply("L'utilisateur ne peut pas avoir un solde négatif !", delete_after = 5)	
+				await ctx.message.delete(delay = 2)
+				return
+
+			# on met à jour son solde sur la database
+			self.eco.update_one({"id": user.id}, {"$set": {"money": amount}})
+			
+			# on envoie un message pour lui dire combien il a gagné
+			embed = discord.Embed(
+				title = "__Réussite__",
+				description = f"Vous avez bien définit à **{amount}€** le solde de {user.mention} !",
+				color = discord.Colour.random(),timestamp = datetime.utcnow()
+			)
+			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			await ctx.message.reply(embed=embed)
+			return
+		else:
+			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **set_money** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **set_money_activation** à True au lieu de False 😉", inline=False)
+			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			# on ajoute une réaction au message de l'utilisateur
+			await ctx.message.add_reaction("❌")
+			# on envoit le embed
+			await ctx.send(embed=embed, delete_after=10)
+			await ctx.message.delete(delay = 2)
+	@set_money.error
+	async def set_money_error(self,ctx, error): 
+		#on vérifie si c'est un manque de permission, si oui, on crée un embed
+		if isinstance(error, discord.ext.commands.MissingPermissions):
+			embed=discord.Embed(title="__ERREUR__", description="Vous avez besoin de la permission de **kick** afin d'ajouter de l'argent !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un mauvais argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.BadArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre un **utilisateur** valide !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un manque d'argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.MissingRequiredArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre le **bon** nombre d'argument(s) !", color=0xff1a1a,timestamp = datetime.utcnow())
+		else:
+			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
+		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help set_money **", inline=False)
 		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
