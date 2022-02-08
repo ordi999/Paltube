@@ -5,6 +5,11 @@ Voir commande -commands du bot
 
 ## 2022-02-07
 ### Ajout
+- Site internet : https://Paltube.repl.co
+- site internet : solde de l'utilisateur
+- site internet : leadearboard
+## 2022-02-07
+### Ajout
 - commande remove_money : Permet aux utilisateurs possédant la permission de kick de retirer de l'argent au solde de quelqu'un
 - commande set_money : Permet aux utilisateurs possédant la permission de kick de définir le solde de quelqu'un
 - commande get_all_data : Permet aux utilisateurs possédant la permission de kick de savoir toutes les informations contenu dans la base de données à propos de quelqu'un

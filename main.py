@@ -25,7 +25,76 @@ import commands.autres as autres
 import commands.economy as economy
 import commands.zone_de_test as zone_de_test
 
+# on se connecte à la database
+client = pymongo.MongoClient(os.environ['DB'])
+db = client.db_name
 
+# Pour créer ou supprimer eco
+#db.create_collection("eco")
+#db.drop_collection("eco")
+#print(db.list_collection_names())
+eco = db.eco
+
+from routes.utils import app
+from quart import Quart, redirect, url_for, render_template, request
+from quart_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
+app = Quart(__name__)
+
+app.secret_key = os.environ.get("session")
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "true"
+app.config["DISCORD_CLIENT_ID"] = os.environ.get("CLIENT_ID")
+app.config["DISCORD_CLIENT_SECRET"] = os.environ.get("CLIENT_SECRET")
+app.config["DISCORD_REDIRECT_URI"] = os.environ.get("RI")
+app.config["DISCORD_BOT_TOKEN"] = os.environ.get("token")
+discordd = DiscordOAuth2Session(app)
+
+@app.route("/")
+async def home():
+	logged = ""
+	lst = []
+	data = {}
+	balance = 0
+	if await discordd.authorized:
+		logged = True
+		user = await discordd.fetch_user()
+
+		check = eco.find_one({"id": user.id})			
+		# si l'utilisateur n'a pas de compte
+		if check is None:
+			#on lui fait un compte
+			create_eco(user,eco)
+			check = eco.find_one({"id": user.id})		
+		# on stock son solde
+		balance = check['money']
+	return await render_template("index.html", logged=logged, balance=balance)
+
+@app.route("/login/")
+async def login():
+	return await discordd.create_session(scope=["identify", "guilds"])
+
+@app.route("/logout/")
+async def logout():
+	discordd.revoke()
+	return redirect(url_for(".home"))
+
+@app.route("/me/")
+@requires_authorization
+async def me():
+  user = await discordd.fetch_user()
+  return redirect(url_for(".home"))
+
+@app.route("/callback/")
+async def callback():
+  await discordd.callback()
+  try:
+    return redirect(bot.url)
+  except:
+    return redirect(url_for(".me"))
+
+@app.errorhandler(Unauthorized)
+async def redirect_unauthorized(e):
+  bot.url = request.url
+  return redirect(url_for(".login"))
 
 ######### Activer ou Désactiver features ##########
 changement_status_activation = True
@@ -60,15 +129,7 @@ bot = commands.Bot(command_prefix=prefix,
                    description='Paltube')
 
 
-# on se connecte à la database
-client = pymongo.MongoClient(os.environ['DB'])
-db = client.db_name
 
-# Pour créer ou supprimer eco
-#db.create_collection("eco")
-#db.drop_collection("eco")
-#print(db.list_collection_names())
-eco = db.eco
 
 #Lorsque le bot se lance
 @bot.event
@@ -95,7 +156,8 @@ bot.help_command = PrettyHelp(navigation=menu, color=discord.Colour.blue())
 
 
 # Appel de la fonction permettant d'host h24
-keep_alive()
+#keep_alive()
+bot.loop.create_task(app.run_task('0.0.0.0'))
 
 # Lancement du bot
 bot.add_cog(moderation.Moderation(bot,kick_activation,delete_activation,prefix))

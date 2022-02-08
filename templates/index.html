@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<!--
+	Solid State by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<script>location.href.match("https://")||(location.href=location.href.replace("http","https"))</script>
+    <script src="https://kit.fontawesome.com/f890ad0835.js" crossorigin="anonymous"></script>
+		<title>Paltube Bot Dashboard</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+    <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/noscript.css') }}"></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+				<!-- Header -->
+					<header id="header" class="alt">
+						<h1><a href="/">Paltube Bot</a></h1>
+						{% if logged %} 
+							<ul class="actions">
+							<li ><a href="/logout/" class="button">Logout</a></li>
+							</ul>
+							{% else %}
+								<ul class="actions">
+								<li><a href="/login/" class="button">Log into Discord</a></li>
+								</ul>
+							{% endif %}
+						<nav>
+							<a href="#menu">Menu</a>
+						</nav>
+					</header>
+
+				<!-- Menu -->
+					<nav id="menu">
+						<div class="inner">
+							<h2>Menu</h2>
+							<ul class="links">
+								<li><a href="/">Home</a></li>
+								<li><a href="#one">Solde</a></li>
+								<li><a href="#two">LEADERBOARD</a></li>
+							</ul>
+							<a href="#" class="close">Close</a>
+						</div>
+					</nav>
+
+				<!-- Banner -->
+					<section id="banner">
+						<div class="inner">
+							<div class="logo"><span class="icon fa-gem"></span></div>
+							<h2>Paltube Bot</h2>
+							<p>Voici paltube, un bot de test !</p>
+              <ul class="actions">
+                <li><a href="#one" class="button">Solde</a></li>
+				<li><a href="#two" class="button">LEADERBOARD</a></li>
+              </ul>
+						</div>
+					</section>
+
+				<!-- Wrapper -->
+					<section id="wrapper">
+
+						<!-- One -->
+							<section id="one" class="wrapper spotlight style1">
+								<div class="inner">
+									{% if logged %} 
+										<h3> Tu as {{balance}}Є dans ton solde !</h3>
+										<br>
+									{% else %}
+										<h3> Connecte toi pour voir ton solde !</h3>
+										<br>
+									{% endif %}
+								</div>
+							</section>
+
+						<!-- Two -->
+							<section id="two" class="wrapper alt spotlight style3">
+								<h2 style="text-align:center; "> Leaderboard </h2>
+								<div class="inner">
+									<iframe style="background: #21313C;border: none;border-radius: 40px;box-shadow: 0 2px 10px 0 rgba(70, 76, 79, .2);" width="480" height="360" src="https://charts.mongodb.com/charts-project-0-xchld/embed/charts?id=db1486c6-9dd6-4aea-b26f-4d438ea4a1fa&maxDataAge=1800&theme=dark&autoRefresh=true"></iframe>
+									<iframe style="margin-left:5%;background: #21313C;border: none;border-radius: 40px;box-shadow: 0 2px 10px 0 rgba(70, 76, 79, .2);" width="480" height="360" src="https://charts.mongodb.com/charts-project-0-xchld/embed/charts?id=62d7d113-f4cb-49ed-abbb-8f1cd7eb47c4&maxDataAge=1800&theme=dark&autoRefresh=true"></iframe>
+								</div>
+							</section> 
+
+						<!-- Three -->
+							<!-- <section id="three" class="wrapper spotlight style3">
+								<div class="inner">
+									<a href="#" class="image"><img src="" alt="" /></a>
+									<div class="content">
+										<h2 class="major">Nullam dignissim</h2>
+										<p>Lorem ipsum dolor sit amet, etiam lorem adipiscing elit. Cras turpis ante, nullam sit amet turpis non, sollicitudin posuere urna. Mauris id tellus arcu. Nunc vehicula id nulla dignissim dapibus. Nullam ultrices, neque et faucibus viverra, ex nulla cursus.</p>
+										<a href="#" class="special">Learn more</a>
+									</div>
+								</div>
+							</section> -->
+
+						<!-- Four -->
+							<!--<section id="four" class="wrapper alt style1">
+								<div class="inner">
+									
+                 
+                  <!-- <section class="features">
+										<article>
+											<a href="#" class="image"><img src="static/zeli.png" alt="" /></a>
+											<h3 class="major">Zeliktric feature</h3>
+											<p>This is the Zeliktric feature YAY</p>
+											<a href="#" class="special">Learn more</a>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="" alt="" /></a>
+											<h3 class="major">Feature 2</h3>
+											<p>This is feature 2 yYAY</p>
+											<a href="#" class="special">Learn more</a>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="" alt="" /></a>
+											<h3 class="major">Feature 3</h3>
+											<p>This is feature 3 YAY</p>
+											<a href="#" class="special">Learn more</a>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="" alt="" /></a>
+											<h3 class="major">Feature 4</h3>
+											<p>This is feature 4 YAY</p>
+											<a href="#" class="special">Learn more</a>
+										</article>
+									</section> -->
+								</div>
+							</section> 
+
+					</section>
+
+				<!-- Footer -->
+					<section id="footer">
+						<div class="inner">
+							<h2 class="major">Liens</h2>
+							<!-- <form method="post" action="#">
+								<div class="fields">
+									<div class="field">
+										<label for="name">Name</label>
+										<input type="text" name="name" id="name" />
+									</div>
+									<div class="field">
+										<label for="email">Email</label>
+										<input type="email" name="email" id="email" />
+									</div>
+									<div class="field">
+										<label for="message">Message</label>
+										<textarea name="message" id="message" rows="4"></textarea>
+									</div>
+								</div>
+								<ul class="actions">
+									<li><input type="submit" value="Send Message" /></li>
+								</ul>
+							</form> -->
+							<ul class="contact">
+								<!--
+								<li class="icon solid fa-home">
+									Address
+								</li>
+								<li class="icon solid fa-phone">Phone Number</li>
+								<li class="icon solid fa-envelope"><a href="mailto:">Email</a></li>
+								<li class="icon brands fa-twitter"><a href="#">Twitter</a></li>
+								<li class="icon brands fa-facebook-f"><a href="#">Facebook</a></li>
+								<li class="icon brands fa-instagram"><a href="#">Instagram</a></li>-->
+                				<li class="icon brands fa-youtube"><a href="https://www.youtube.com/channel/UCcTjWStf_JY28QQFoyjCfLQ">YouTube</a></li>
+                				<li class="icon brands fa-discord"><a href="https://discord.com/api/oauth2/authorize?client_id=935874631364132894&permissions=8&scope=bot">Discord</a></li>
+								<!--<li class="icon brands fa-paypal"><a href="#">PayPal</a></li>-->
+								<!--<li class="icon brands fa-patreon"><a href="#">Patreon</a></li>-->
+								<li class="icon brands fa-github"><a href="https://github.com/ordi999/Paltube">GitHub</a></li>
+							</ul>
+							<ul class="copyright">
+								<li>&copy; ordi999. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+							</ul>
+						</div>
+					</section>
+
+			</div>
+    {% block scripts %}
+		<!-- Scripts -->
+			<script src="static/js/jquery.min.js"></script>
+			<script src="static/js/jquery.scrollex.min.js"></script>
+			<script src="static/js/browser.min.js"></script>
+			<script src="static/js/breakpoints.min.js"></script>
+			<script src="static/js/util.js"></script>
+			<script src="static/js/main.js"></script>
+    {% endblock %}
+	</body>
+</html>
