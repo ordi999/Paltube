@@ -2,29 +2,15 @@ import discord
 from datetime import datetime, timedelta
 import random
 
-# fonction pour créer un compte
-def create_eco(user, eco):
-	# on regarde si un compte est déjà éxistant
-	check = eco.find_one({"id" : user.id})
-	if check == None:
-		#s'il n'y a pas de compte on lui en cré un
-		insert = {
-			"id": user.id,
-			"name": user.name,
-			"tags": user.discriminator,
-			"money": 10,
-			"daily_streak": 0,
-			"last_daily": datetime.fromtimestamp(float(str(datetime.now().timestamp()))) - timedelta(days = 1),
-			"best_daily_streak":0
-		}
-		eco.insert_one(insert)
+
+from commands.functions.database import create_eco
 
 
 # Catégories économie
 class Economy(discord.ext.commands.Cog):
 	""" Toutes les commandes en rapport avec l'économie """
 	# permet de récupérer les informations utile pour les commandes
-	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation,get_all_data_activation, reset_user_account_activation,coinflip_activation,reward_activation):
+	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation,get_all_data_activation, reset_user_data_activation,coinflip_activation,reward_activation):
 		self.bot = bot
 		self.eco = eco
 		self.prefix = prefix
@@ -37,7 +23,7 @@ class Economy(discord.ext.commands.Cog):
 		self.remove_money_activation = remove_money_activation
 		self.set_money_activation = set_money_activation
 		self.get_all_data_activation = get_all_data_activation
-		self.reset_user_account_activation = reset_user_account_activation
+		self.reset_user_data_activation = reset_user_data_activation
 		self.coinflip_activation = coinflip_activation
 		self.reward_activation = reward_activation
 	# commande bal pour savoir son solde ou celui de quelqu'un
@@ -789,13 +775,13 @@ class Economy(discord.ext.commands.Cog):
 		await ctx.message.delete(delay = 2)
 
 	@discord.ext.commands.command(
-		name="reset_user_account",
+		name="reset_user_data",
 		brief="Permet de reset toutes les informations de quelqu'un ! (nécéssite la permission de kick)",
 		help="Permet de reset toutes les informations de quelqu'un ! (nécéssite la permission de kick)")
 	@discord.ext.commands.has_permissions(kick_members=True)
-	async def reset_user_account(self,ctx,user: discord.Member):
+	async def reset_user_data(self,ctx,user: discord.Member):
 		# si la commande est activée
-		if self.reset_user_account_activation:
+		if self.reset_user_data_activation:
 			
 			# on stock le dictionnaire contenant les infos de l'utilisateur
 			check = self.eco.find_one({"id": user.id})
@@ -817,9 +803,9 @@ class Economy(discord.ext.commands.Cog):
 			return
 		else:
 			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
-			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **reset_user_account** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **reset_user_data** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
-			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **reset_user_account_activation** à True au lieu de False 😉", inline=False)
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **reset_user_data_activation** à True au lieu de False 😉", inline=False)
 			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
@@ -827,8 +813,8 @@ class Economy(discord.ext.commands.Cog):
 			await ctx.send(embed=embed, delete_after=10)
 			await ctx.message.delete(delay = 2)
 	
-	@reset_user_account.error
-	async def reset_user_account_error(self,ctx, error): 
+	@reset_user_data.error
+	async def reset_user_data_error(self,ctx, error): 
 		#on vérifie si c'est un manque de permission, si oui, on crée un embed
 		if isinstance(error, discord.ext.commands.MissingPermissions):
 			embed=discord.Embed(title="__ERREUR__", description="Vous avez besoin de la permission de **kick** afin d'ajouter de l'argent !", color=0xff1a1a,timestamp = datetime.utcnow())
@@ -841,7 +827,7 @@ class Economy(discord.ext.commands.Cog):
 		else:
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
-		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help reset_user_account **", inline=False)
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help reset_user_data **", inline=False)
 		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")

@@ -5,6 +5,7 @@ Voir commande -commands du bot
 
 ## 2022-02-12
 ### Ajout
+- Fichier functions contenu dans le fichier commande, il permet de stocker des fichiers python avec des fonctions utile / création dans ce fichier functions du fichier database.py contenant la fonction create_eco
 - commande coinflip : Permet de parier une somme ainsi qu'une face. Suite à ce pari, il y a une chance sur deux de gagner !
 - commande reward : permet de gagner 50 toutes les heures (cette fois j'ai utilisé le cooldown de discord puisque c'est une durée plus courte)
 ### Changement

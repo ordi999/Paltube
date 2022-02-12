@@ -20,10 +20,10 @@ from asyncio import sleep
 from datetime import datetime
 
 #importation des cogs
-import commands.moderation as moderation
-import commands.autres as autres
-import commands.economy as economy
-import commands.zone_de_test as zone_de_test
+from commands import moderation
+from commands import autres
+from commands import economy
+from commands import zone_de_test
 
 # on se connecte à la database
 client = pymongo.MongoClient(os.environ['DB'])
