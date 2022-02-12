@@ -62,7 +62,7 @@ async def home():
 		# si l'utilisateur n'a pas de compte
 		if check is None:
 			#on lui fait un compte
-			create_eco(user,eco)
+			economy.create_eco(user,eco)
 			check = eco.find_one({"id": user.id})		
 		# on stock son solde
 		balance = check['money']
@@ -112,6 +112,7 @@ remove_money_activation = True
 set_money_activation = True
 get_all_data_activation = True
 reset_user_account_activation = True
+coinflip_activation = True
 
 #Tous les status que vas prendre le bot
 status = cycle([
@@ -164,7 +165,7 @@ bot.add_cog(moderation.Moderation(bot,kick_activation,delete_activation,prefix))
 
 bot.add_cog(autres.Autres(bot,prefix,commands_activation))
 
-bot.add_cog(economy.Economy(bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation,remove_money_activation,set_money_activation,get_all_data_activation,reset_user_account_activation))
+bot.add_cog(economy.Economy(bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation,remove_money_activation,set_money_activation,get_all_data_activation,reset_user_account_activation,coinflip_activation))
 
 bot.add_cog(zone_de_test.Zone_de_test(bot,prefix, dice_activation))
 

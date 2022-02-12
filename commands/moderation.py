@@ -25,7 +25,7 @@ class Moderation(discord.ext.commands.Cog):
 				# Si oui on renvoie un message d'erreur
 				embed=discord.Embed(title="__ERREUR__", description="La commande **kick** ne marche pas sur moi 🙃",url="https://youtu.be/dQw4w9WgXcQ", color=0xff1a1a,timestamp = datetime.utcnow())
 				embed.set_thumbnail(url="https://www.presse-citron.net/app/uploads/2000/Meme_Rick_Roll_Rick_Astley-Presse-Citron.jpg")
-				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 				# on ajoute une réaction au message de l'utilisateur
 				await ctx.message.add_reaction("❌")
 				
@@ -44,7 +44,7 @@ class Moderation(discord.ext.commands.Cog):
 				embed.add_field(name="raison:", value=reason, inline=False)
 				embed.set_thumbnail(url=member.avatar_url)
 				# on ajoute une réaction au message de l'utilisateur
-				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 				await ctx.message.add_reaction("✅")
 				# on envoit le embed
 				await ctx.send(embed=embed)
@@ -53,7 +53,7 @@ class Moderation(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **kick** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **kick_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -76,7 +76,7 @@ class Moderation(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help kick **", inline=False)
-		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -104,7 +104,7 @@ class Moderation(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **delete** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **delete_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -126,7 +126,7 @@ class Moderation(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help delete** !", inline=False)
-		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed

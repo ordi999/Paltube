@@ -3,11 +3,16 @@
 ## [Futur Changement]
 Voir commande -commands du bot
 
-## 2022-02-07
+## 2022-02-12
+### Ajout
+- commande coinflip : Permet de parier une somme ainsi qu'une face. Suite à ce pari, il y a une chance sur deux de gagner !
+
+## 2022-02-08
 ### Ajout
 - Site internet : https://Paltube.repl.co
 - site internet : solde de l'utilisateur
 - site internet : leadearboard
+
 ## 2022-02-07
 ### Ajout
 - commande remove_money : Permet aux utilisateurs possédant la permission de kick de retirer de l'argent au solde de quelqu'un

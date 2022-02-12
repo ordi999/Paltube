@@ -24,7 +24,7 @@ def create_eco(user, eco):
 class Economy(discord.ext.commands.Cog):
 	""" Toutes les commandes en rapport avec l'économie """
 	# permet de récupérer les informations utile pour les commandes
-	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation,get_all_data_activation, reset_user_account_activation):
+	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation,get_all_data_activation, reset_user_account_activation,coinflip_activation):
 		self.bot = bot
 		self.eco = eco
 		self.prefix = prefix
@@ -38,6 +38,7 @@ class Economy(discord.ext.commands.Cog):
 		self.set_money_activation = set_money_activation
 		self.get_all_data_activation = get_all_data_activation
 		self.reset_user_account_activation = reset_user_account_activation
+		self.coinflip_activation = coinflip_activation
 	# commande bal pour savoir son solde ou celui de quelqu'un
 	@discord.ext.commands.command(
 	name="bal",
@@ -70,7 +71,7 @@ class Economy(discord.ext.commands.Cog):
 					color = discord.Colour.random(),
 					timestamp = datetime.utcnow()
 				)
-				embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 				# on utilise la fonction reply
 				await ctx.message.reply(embed=embed)
 				return
@@ -95,7 +96,7 @@ class Economy(discord.ext.commands.Cog):
 					color = discord.Colour.random(),
 					timestamp = datetime.utcnow()
 				)
-				embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 				await ctx.message.reply(embed=embed)
 				return
 		else:
@@ -103,7 +104,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **bal** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **bal_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -118,7 +119,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help bal **", inline=False)
-		embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -166,7 +167,7 @@ class Economy(discord.ext.commands.Cog):
 				description = f"Tu as travaillé en tant que **{job}** et tu as gagné **{amount}€** !",
 				color = discord.Colour.random(),timestamp = datetime.utcnow()
 			)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			await ctx.message.reply(embed=embed)
 			return
 		else:
@@ -174,7 +175,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **work** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **work_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -191,7 +192,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help work **", inline=False)
-		embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -256,7 +257,7 @@ class Economy(discord.ext.commands.Cog):
 					title = "Paiement réussi 🤑",
 					description = f"Vous avez donné **{amount}€** à **{user.mention}** !  🎉",
 					color = discord.Colour.random(),timestamp = datetime.utcnow())
-				embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 				await ctx.message.reply(embed=embed)
 				return
 
@@ -270,7 +271,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **pay** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **pay_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -288,7 +289,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help pay **", inline=False)
-		embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -379,7 +380,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **bet** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **bet_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -398,7 +399,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help bet **", inline=False)
-		embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -480,7 +481,7 @@ class Economy(discord.ext.commands.Cog):
 			# on prévient l'utilisateur qu'il a recu son daily streak
 			embed=discord.Embed(title="__Daily reward__", description=f"Vous avez récupéré votre récompense de **{daily}€** et vous avez atteint un combo de **{streak} jours** d'affilés !", color=discord.Colour.green(),timestamp = datetime.utcnow())
 			embed.add_field(name="__Meilleur combo__", value=f"Votre meilleur combo est de **{best} jours** d'affilés !", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			await ctx.message.add_reaction("✅")
 			await ctx.message.reply(embed=embed)
 		else:
@@ -488,7 +489,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **daily** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **daily_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -501,7 +502,7 @@ class Economy(discord.ext.commands.Cog):
 		embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help daily **", inline=False)
-		embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -544,7 +545,8 @@ class Economy(discord.ext.commands.Cog):
 				description = f"Vous avez bien rajouté **{amount}€** sur le compte de {user.mention} !",
 				color = discord.Colour.random(),timestamp = datetime.utcnow()
 			)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+			
 			await ctx.message.reply(embed=embed)
 			return
 		else:
@@ -552,7 +554,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **add_money** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **add_money_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -573,7 +575,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help add_money **", inline=False)
-		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -616,7 +618,7 @@ class Economy(discord.ext.commands.Cog):
 				description = f"Vous avez bien retiré **{amount}€** du compte de {user.mention} !",
 				color = discord.Colour.random(),timestamp = datetime.utcnow()
 			)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			await ctx.message.reply(embed=embed)
 			return
 		else:
@@ -624,7 +626,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **remove_money** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **remove_money_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -645,7 +647,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help remove_money **", inline=False)
-		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -686,7 +688,7 @@ class Economy(discord.ext.commands.Cog):
 				description = f"Vous avez bien définit à **{amount}€** le solde de {user.mention} !",
 				color = discord.Colour.random(),timestamp = datetime.utcnow()
 			)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			await ctx.message.reply(embed=embed)
 			return
 		else:
@@ -694,7 +696,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **set_money** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **set_money_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -715,7 +717,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help set_money **", inline=False)
-		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -744,7 +746,7 @@ class Economy(discord.ext.commands.Cog):
 				title = f"__Information de {user}__",
 				color = discord.Colour.random(),timestamp = datetime.utcnow()
 			)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 
 			for elt in check:
 				embed.add_field(name=f"**{elt}**", value=check[elt], inline=False)
@@ -756,7 +758,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **get_all_data** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **get_all_data_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -778,7 +780,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help get_all_data **", inline=False)
-		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -808,7 +810,7 @@ class Economy(discord.ext.commands.Cog):
 				title = f"__Reset de {user}__",description=f"Le compte de {user.mention} a bien été reset",
 				color = discord.Colour.random(),timestamp = datetime.utcnow()
 			)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			
 			await ctx.message.reply(embed=embed)
 			return
@@ -817,7 +819,7 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **reset_user_account** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **reset_user_account_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandée par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -839,7 +841,88 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help reset_user_account **", inline=False)
-		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+		# on ajoute une réaction au message de l'utilisateur
+		await ctx.message.add_reaction("❌")
+		# on envoit le embed
+		await ctx.send(embed=embed, delete_after=5)
+		await ctx.message.delete(delay = 2)
+	
+	@discord.ext.commands.command(
+		name="coinflip",
+		brief="Permet de parier une somme sur un lancer de pièce, si la pièce tombe sur la face choisis, tu double l'argent parié !",
+		help="Permet de parier une somme sur un lancer de pièce, si la pièce tombe sur la face choisis, tu double l'argent parié ! (arg = 'face' ou 'pile')")
+	async def coinflip(self,ctx, amount: int, arg: str):
+		if self.coinflip_activation:
+			arg = arg.lower()
+			random_arg = random.choice(["pile", "face"])
+			
+			if amount <= 0:
+				# on prévient que c'est impossible
+				await ctx.message.reply("Il faut mettre une somme valide")
+				return
+
+			user = ctx.author
+
+			check = self.eco.find_one({"id": user.id})
+			
+			# si l'utilisateur n'a pas de compte
+			if check is None:
+				# on lui fait un compte
+				create_eco(user,self.eco)
+				check = self.eco.find_one({"id": user.id})
+
+			embed = discord.Embed(
+				colour=discord.Color.from_rgb(244, 182, 89),timestamp = datetime.utcnow()
+			)
+
+			if arg not in ["pile", "face"]:
+				await ctx.message.reply("Il faut mettre un **argument** valide (**face** ou **pile**)",delete_after = 5)
+				await ctx.message.delete(delay = 2)
+				return
+
+			balance = check['money']
+			if balance >= amount:
+				if arg == random_arg:
+					self.eco.update_one({"id": user.id}, {"$set": {"money": balance + amount}})
+
+					embed.add_field(name="Coinflip", value=f"Tu as **gagné** le coinflip ! \n\nTu as doublé ta mise de **{amount}€**")
+					embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+					await ctx.message.reply(embed=embed)
+				else:
+					self.eco.update_one({"id": user.id}, {"$set": {"money": balance - amount}})
+
+					embed.add_field(name="Coinflip", value=f"Tu as **perdu** le coinflip ! \n\nTu as perdu ta mise de **{amount}€**")
+					embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+					await ctx.message.reply(embed=embed)
+			else:
+				await ctx.message.reply("Vous n'avez pas assez d'argent ")
+				return
+		else:
+			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **coinflip** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **coinflip_activation** à True au lieu de False 😉", inline=False)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+			# on ajoute une réaction au message de l'utilisateur
+			await ctx.message.add_reaction("❌")
+			# on envoit le embed
+			await ctx.send(embed=embed, delete_after=10)
+			await ctx.message.delete(delay = 2)
+	
+	@coinflip.error
+	async def coinflip_error(self,ctx, error): 
+		#on vérifie si c'est un mauvais argument, si oui, on crée un embed
+		if isinstance(error, discord.ext.commands.BadArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre une **somme** valide !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un manque d'argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.MissingRequiredArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre le **bon** nombre d'argument(s) !", color=0xff1a1a,timestamp = datetime.utcnow())
+		else:
+			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
+		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help coinflip **", inline=False)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed

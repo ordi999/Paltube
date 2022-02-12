@@ -31,7 +31,7 @@ class Autres(discord.ext.commands.Cog):
 			embed.add_field(name="__Modération __", value="-ban / temp ban / unban\n-~~kick~~ : **Fait par ordi999**\n-mute / temp mute / unmute\n-~~delete message~~ : **Fait par ordi999** \n-warn\n-slowmode", inline=False)
 			
 			#Ajout d'un footer affichant le pseudo de la personne ayant demandé la commande
-			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# Envoit de l'embed dans le channel
 			await ctx.send(embed=embed)
 		else:
@@ -39,7 +39,7 @@ class Autres(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **commands** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
 			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **commands_activation** à True au lieu de False 😉", inline=False)
-			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 			# on ajoute une réaction au message de l'utilisateur
 			await ctx.message.add_reaction("❌")
 			# on envoit le embed
@@ -50,7 +50,7 @@ class Autres(discord.ext.commands.Cog):
 		embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help commands **", inline=False)
-		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
@@ -72,7 +72,7 @@ class Autres(discord.ext.commands.Cog):
 
 		embed.add_field(name="Description:", value=reason, inline=False)
 		
-		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 
 		# on envoit le embed à ordi999
 		await ordi999.send(embed=embed)
@@ -93,7 +93,7 @@ class Autres(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help bug **", inline=False)
-		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
 		# on envoit le embed
