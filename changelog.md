@@ -6,6 +6,10 @@ Voir commande -commands du bot
 ## 2022-02-12
 ### Ajout
 - commande coinflip : Permet de parier une somme ainsi qu'une face. Suite à ce pari, il y a une chance sur deux de gagner !
+- commande reward : permet de gagner 50 toutes les heures (cette fois j'ai utilisé le cooldown de discord puisque c'est une durée plus courte)
+### Changement
+- Ajout de l'image de profil dans le footer des embeds
+- gain de la commande daily : 100 + 10 par jour consécutifs
 
 ## 2022-02-08
 ### Ajout

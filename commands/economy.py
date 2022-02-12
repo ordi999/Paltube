@@ -24,7 +24,7 @@ def create_eco(user, eco):
 class Economy(discord.ext.commands.Cog):
 	""" Toutes les commandes en rapport avec l'économie """
 	# permet de récupérer les informations utile pour les commandes
-	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation,get_all_data_activation, reset_user_account_activation,coinflip_activation):
+	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation,get_all_data_activation, reset_user_account_activation,coinflip_activation,reward_activation):
 		self.bot = bot
 		self.eco = eco
 		self.prefix = prefix
@@ -39,6 +39,7 @@ class Economy(discord.ext.commands.Cog):
 		self.get_all_data_activation = get_all_data_activation
 		self.reset_user_account_activation = reset_user_account_activation
 		self.coinflip_activation = coinflip_activation
+		self.reward_activation = reward_activation
 	# commande bal pour savoir son solde ou celui de quelqu'un
 	@discord.ext.commands.command(
 	name="bal",
@@ -471,7 +472,7 @@ class Economy(discord.ext.commands.Cog):
 				self.eco.update_one({"id": user.id}, {"$set": {"best_daily_streak": best}})
 			
 			# on calcule la récompense
-			daily = 45 + (streak * 5)
+			daily = 90 + (streak * 10)
 
 			# on update les données
 			self.eco.update_one({"id": user.id}, {"$set": {"money": balance + daily}})
@@ -922,6 +923,73 @@ class Economy(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help coinflip **", inline=False)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+		# on ajoute une réaction au message de l'utilisateur
+		await ctx.message.add_reaction("❌")
+		# on envoit le embed
+		await ctx.send(embed=embed, delete_after=5)
+		await ctx.message.delete(delay = 2)
+	
+
+	@discord.ext.commands.command(
+		name="reward",
+		brief="Permet de gagner de l'argent toutes les heures !",
+		help="Permet de gagner de l'argent toutes les heures !") 
+	@discord.ext.commands.cooldown(1, 3600, discord.ext.commands.BucketType.user)
+	async def reward(self,ctx):
+		if self.reward_activation:
+			# on récupère l'utilisateur
+			user = ctx.author
+
+			# on stock le dictionnaire contenant les infos de l'utilisateur
+			check = self.eco.find_one({"id": user.id})
+			
+			# si l'utilisateur n'a pas de compte
+			if check is None:
+				# on lui en fait un
+				create_eco(user,self.eco)
+				check = self.eco.find_one({"id": user.id})
+			
+			# on récupère son solde
+			balance = check['money']
+
+			# on update les données
+			self.eco.update_one({"id": user.id}, {"$set": {"money": balance + 50}})
+
+			# on prévient l'utilisateur qu'il a recu son daily streak
+			embed=discord.Embed(title="__Reward__", description=f"Vous avez récupéré votre récompense de **50€** ! \n\n Revenez dans 1h afin de récupérer une nouvelle récompense", color=discord.Colour.green(),timestamp = datetime.utcnow())
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+			await ctx.message.add_reaction("✅")
+			await ctx.message.reply(embed=embed)
+		else:
+			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **reward** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **reward_activation** à True au lieu de False 😉", inline=False)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+			# on ajoute une réaction au message de l'utilisateur
+			await ctx.message.add_reaction("❌")
+			# on envoit le embed
+			await ctx.send(embed=embed, delete_after=10)
+			await ctx.message.delete(delay = 2)
+	
+	@reward.error
+	async def reward_error(self,ctx, error):
+		if isinstance(error, discord.ext.commands.CommandOnCooldown):
+			temps = error.retry_after
+			if(temps/60 <60 and temps/60>=1):
+					temps = str(int(temps/60)) + " minutes et " + str(int(temps%60)) + " secondes"
+			else:
+				# sinon c'est un temps en seconde, on le convertit
+				temps =  str(int(temps)) + " secondes"
+			# on prévient qu'il y a encore un cooldown
+			await ctx.message.reply(f"Il y a un cooldown, veuillez encore attendre {temps}", delete_after = 5)
+			await ctx.message.delete(delay = 2)
+		else:
+			# on crée l'erreur
+			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
+		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help reward **", inline=False)
 		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")
