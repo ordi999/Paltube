@@ -99,6 +99,8 @@ async def redirect_unauthorized(e):
 ######### Activer ou Désactiver features ##########
 changement_status_activation = True
 kick_activation = True
+ban_activation = True
+unban_activation = True
 delete_activation =True
 commands_activation = True
 bal_activation = True
@@ -114,6 +116,7 @@ get_all_data_activation = True
 reset_user_account_activation = True
 coinflip_activation = True
 reward_activation = True
+slots_activation = False
 
 #Tous les status que vas prendre le bot
 status = cycle([
@@ -127,7 +130,8 @@ prefix='-'
 default_intents = discord.Intents.default()
 default_intents.members = True
 bot = commands.Bot(command_prefix=prefix,
-                   intents=default_intents,
+                   intents=discord.Intents.all(),
+				   case_insensitive = True, #Pour qu'on puisse écrire les commandes en majs en min
                    description='Paltube')
 
 
@@ -162,11 +166,11 @@ bot.help_command = PrettyHelp(navigation=menu, color=discord.Colour.blue())
 bot.loop.create_task(app.run_task('0.0.0.0'))
 
 # Lancement du bot
-bot.add_cog(moderation.Moderation(bot,kick_activation,delete_activation,prefix))
+bot.add_cog(moderation.Moderation(bot,kick_activation,delete_activation,ban_activation,unban_activation,prefix))
 
 bot.add_cog(autres.Autres(bot,prefix,commands_activation))
 
-bot.add_cog(economy.Economy(bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation,remove_money_activation,set_money_activation,get_all_data_activation,reset_user_account_activation,coinflip_activation, reward_activation))
+bot.add_cog(economy.Economy(bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation,remove_money_activation,set_money_activation,get_all_data_activation,reset_user_account_activation,coinflip_activation, reward_activation,slots_activation))
 
 bot.add_cog(zone_de_test.Zone_de_test(bot,prefix, dice_activation))
 

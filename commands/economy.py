@@ -3,14 +3,14 @@ from datetime import datetime, timedelta
 import random
 
 
-from commands.functions.database import create_eco
+from commands.functions import create_eco
 
 
 # Catégories économie
 class Economy(discord.ext.commands.Cog):
 	""" Toutes les commandes en rapport avec l'économie """
 	# permet de récupérer les informations utile pour les commandes
-	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation,get_all_data_activation, reset_user_data_activation,coinflip_activation,reward_activation):
+	def __init__(self,bot,eco,prefix,bal_activation, work_activation,pay_activation,bet_activation,daily_activation,add_money_activation, remove_money_activation,set_money_activation,get_all_data_activation, reset_user_data_activation,coinflip_activation,reward_activation, slots_activation):
 		self.bot = bot
 		self.eco = eco
 		self.prefix = prefix
@@ -26,6 +26,7 @@ class Economy(discord.ext.commands.Cog):
 		self.reset_user_data_activation = reset_user_data_activation
 		self.coinflip_activation = coinflip_activation
 		self.reward_activation = reward_activation
+		self.slots_activation = slots_activation
 	# commande bal pour savoir son solde ou celui de quelqu'un
 	@discord.ext.commands.command(
 	name="bal",
@@ -883,8 +884,8 @@ class Economy(discord.ext.commands.Cog):
 					embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 					await ctx.message.reply(embed=embed)
 			else:
-				await ctx.message.reply("Vous n'avez pas assez d'argent ")
-				return
+				await ctx.message.reply("Vous n'avez pas assez d'argent ",delete_after=5)
+				await ctx.message.delete(delay = 2)
 		else:
 			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
 			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **coinflip** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
@@ -982,3 +983,67 @@ class Economy(discord.ext.commands.Cog):
 		# on envoit le embed
 		await ctx.send(embed=embed, delete_after=5)
 		await ctx.message.delete(delay = 2)
+
+	@discord.ext.commands.command(
+		name="slots",
+		brief="Ceci est une machine à sous, vous pouvre gagner plus ou moins d'argent !",
+		help="Ceci est une machine à sous, vous pouvre gagner plus ou moins d'argent !") 
+	async def slots(self, ctx, money: int):
+		if self.slots_activation:
+			user = ctx.author
+			
+			random_slots_data = ["", "", "",
+								"", "", "",
+								"", "", ""]
+
+			for i in range(len(random_slots_data)):
+				random_slots_data[i] = random.choice([":tada:", ":cookie:", ":large_blue_diamond:",":money_with_wings:", ":moneybag:", ":cherries:"])
+			
+
+			check = self.eco.find_one({"id": user.id})
+
+			# si l'utilisateur n'a pas de compte
+			if check is None:
+				# on lui en fait un
+				create_eco(user,self.eco)
+				check = self.eco.find_one({"id": user.id})
+				
+			# on récupère son solde
+			balance = check['money']
+			
+			#r = await economy.get_user(ctx.message.author.id)
+			embed = discord.Embed()
+
+			if balance >= money:
+
+				embed = discord.Embed(title="Slots", description=f"""{random_slots_data[0]} | {random_slots_data[1]} | {random_slots_data[2]}
+				{random_slots_data[3]} | {random_slots_data[4]} | {random_slots_data[5]}
+				{random_slots_data[6]} | {random_slots_data[7]} | {random_slots_data[8]}""",colour=discord.Color.from_rgb(244, 182, 89),timestamp = datetime.utcnow())
+
+				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+
+				embed.add_field(name = "Récompense",value=":tada: -> x2\n:cookie: -> x2\n:large_blue_diamond: -> x2\n:money_with_wings: -> x2\n:moneybag: -> x2\n:cherries: -> x2",inline = False)
+
+				if random_slots_data[3] == random_slots_data[4] and random_slots_data[5] == random_slots_data[3]:
+					#await economy.add_money(ctx.message.author.id, "bank", money_multi)
+					embed.add_field(name="Tu as gagné",value=f"{random_slots_data[3]} -> 15$ x2",inline = False)
+				else:
+					#await economy.remove_money(ctx.message.author.id, "bank", money)
+					embed.add_field(name="Tu as perdu",value=f"{random_slots_data[3]} -> 15$ x2",inline = False)
+
+				await ctx.message.reply(embed=embed)
+
+			else:
+				await ctx.message.reply("Vous n'avez pas assez d'argent ",delete_after=5)
+				await ctx.message.delete(delay = 2)
+		else:
+			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **slots** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **slots_activation** à True au lieu de False 😉", inline=False)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+			# on ajoute une réaction au message de l'utilisateur
+			await ctx.message.add_reaction("❌")
+			# on envoit le embed
+			await ctx.send(embed=embed, delete_after=10)
+			await ctx.message.delete(delay = 2)

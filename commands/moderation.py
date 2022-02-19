@@ -5,10 +5,12 @@ from datetime import datetime
 
 class Moderation(discord.ext.commands.Cog):
 	""" Toutes les commandes de Modérations """
-	def __init__(self,bot,kick_activation,delete_activation, prefix):
+	def __init__(self,bot,kick_activation,delete_activation, ban_activation,unban_activation,prefix):
 		self.bot = bot
 		self.kick_activation = kick_activation
 		self.delete_activation = delete_activation
+		self.ban_activation = ban_activation
+		self.unban_activation = unban_activation
 		self.prefix = prefix
 	@discord.ext.commands.command(
 	name="kick",
@@ -126,6 +128,138 @@ class Moderation(discord.ext.commands.Cog):
 			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
 		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
 		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help delete** !", inline=False)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+		# on ajoute une réaction au message de l'utilisateur
+		await ctx.message.add_reaction("❌")
+		# on envoit le embed
+		await ctx.send(embed=embed, delete_after=5)
+		await ctx.message.delete(delay = 2)
+
+
+	@discord.ext.commands.command(
+	name="ban",
+	brief="Permet de bannir un membre du serveur",
+	help="utilisez cette commande afin de bannir quelqu'un du serveur !")
+	###### Commande ban
+	#on vérifie si l'utilisateur a la perm de ban
+	@discord.ext.commands.has_permissions(ban_members=True)
+	async def ban(self,ctx, member: discord.Member, *, reason=None):
+		# on vérifie si ban est activé
+		if(self.ban_activation):
+			# on vérifie si on mentionne le bot
+			if self.bot.user.mention == member.mention :
+				# Si oui on renvoie un message d'erreur
+				embed=discord.Embed(title="__ERREUR__", description="La commande **ban** ne marche pas sur moi 🙃",url="https://youtu.be/dQw4w9WgXcQ", color=0xff1a1a,timestamp = datetime.utcnow())
+				embed.set_thumbnail(url="https://www.presse-citron.net/app/uploads/2000/Meme_Rick_Roll_Rick_Astley-Presse-Citron.jpg")
+				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+				# on ajoute une réaction au message de l'utilisateur
+				await ctx.message.add_reaction("❌")
+				
+				await ctx.send(embed=embed, delete_after=5)
+				await ctx.message.delete(delay = 2)
+			else:
+				# Si non, on vérifie s'il y a une raison
+				if reason==None:
+					#s'il n'y a pas de raison, on donne une valeur à la raison
+					reason="Dieu a frappé 🔥"
+				# on ban le membre ciblé
+				await ctx.guild.ban(member)
+				# On fait un embed de confirmation
+				embed = discord.Embed(title="__Ban__",description=f"{member.mention} a été ban",colour=discord.Colour.green(),timestamp = datetime.utcnow())
+				embed.add_field(name="Par:", value=ctx.author.mention, inline=False)
+				embed.add_field(name="raison:", value=reason, inline=False)
+				embed.set_thumbnail(url=member.avatar_url)
+				# on ajoute une réaction au message de l'utilisateur
+				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+				await ctx.message.add_reaction("✅")
+				# on envoit le embed
+				await ctx.send(embed=embed)
+		else:
+			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **ban** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **ban_activation** à True au lieu de False 😉", inline=False)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+			# on ajoute une réaction au message de l'utilisateur
+			await ctx.message.add_reaction("❌")
+			# on envoit le embed
+			await ctx.send(embed=embed, delete_after=10) 
+			await ctx.message.delete(delay = 2)
+
+	#s'il y a une erreur lors de la commande ban
+	@ban.error
+	async def ban_error(self,ctx, error): 
+		#on vérifie si c'est un manque de permission, si oui, on crée un embed
+		if isinstance(error, discord.ext.commands.MissingPermissions):
+			embed=discord.Embed(title="__ERREUR__", description="Vous avez besoin de la permission de **ban** !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un mauvais argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.BadArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre un **utilisateur** valide !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un manque d'argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.MissingRequiredArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre le **bon** nombre d'argument(s) !", color=0xff1a1a,timestamp = datetime.utcnow())
+		else:
+			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
+		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help ban **", inline=False)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+		# on ajoute une réaction au message de l'utilisateur
+		await ctx.message.add_reaction("❌")
+		# on envoit le embed
+		await ctx.send(embed=embed, delete_after=5)
+		await ctx.message.delete(delay = 2)
+
+	@discord.ext.commands.command(
+	name="unban",
+	brief="Permet de débannir un membre du serveur (il faut utiliser son ID discord)",
+	help="utilisez cette commande afin de débannir quelqu'un du serveur !(il faut utiliser son ID discord)")
+	###### Commande unban
+	#on vérifie si l'utilisateur a la perm de ban
+	@discord.ext.commands.has_permissions(ban_members=True)
+	async def unban(self,ctx, member_id):
+		# on vérifie si unban est activé
+		if(self.unban_activation):
+			user = await self.bot.fetch_user(member_id)
+			await ctx.guild.unban(user)
+			
+			embed = discord.Embed(title="__Ban__",description=f"{user.mention} a été déban",colour=discord.Colour.green(),timestamp = datetime.utcnow())
+			embed.add_field(name="Par:", value=ctx.author.mention, inline=False)
+			embed.set_thumbnail(url=user.avatar_url)
+			# on ajoute une réaction au message de l'utilisateur
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+			await ctx.message.add_reaction("✅")
+				# on envoit le embed
+			await ctx.send(embed=embed)
+		else:
+			# si la commande est désactivé, on fait un embed pour prévenir l'utilisateur
+			embed=discord.Embed(title="__Commande désactivée !__", description="La commande **unban** est désactivé 😥", color=0xff1a1a,timestamp = datetime.utcnow())
+			embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+			embed.add_field(name="__Comment la réactiver ?__", value="Il vous suffit d'aller dans le code du bot puis de mettre la valeur de **unban_activation** à True au lieu de False 😉", inline=False)
+			embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+			# on ajoute une réaction au message de l'utilisateur
+			await ctx.message.add_reaction("❌")
+			# on envoit le embed
+			await ctx.send(embed=embed, delete_after=10) 
+			await ctx.message.delete(delay = 2)
+
+	#s'il y a une erreur lors de la commande ban
+	@unban.error
+	async def unban_error(self,ctx, error): 
+		#on vérifie si c'est un manque de permission, si oui, on crée un embed
+		if isinstance(error, discord.ext.commands.MissingPermissions):
+			embed=discord.Embed(title="__ERREUR__", description="Vous avez besoin de la permission de **ban** !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un mauvais argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.BadArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre un **utilisateur** valide !", color=0xff1a1a,timestamp = datetime.utcnow())
+		#sinon on vérifie si c'est un manque d'argument, si oui, on crée un embed
+		elif isinstance(error, discord.ext.commands.MissingRequiredArgument):
+			embed=discord.Embed(title="__ERREUR__", description="Veuillez mettre le **bon** nombre d'argument(s) !", color=0xff1a1a,timestamp = datetime.utcnow())
+		elif isinstance(error,discord.ext.commands.CommandInvokeError):
+			embed=discord.Embed(title="__ERREUR__", description="l'utilisateur que vous cherchez n'est pas dans la liste des bannis ! (vérifiez que vous utilisez bien l'ID discord de l'utilisateur que vous souhaitez unban)", color=0xff1a1a,timestamp = datetime.utcnow())
+		else:
+			embed=discord.Embed(title="__ERREUR__", description="Il y a eu une erreur !", color=0xff1a1a,timestamp = datetime.utcnow())
+		embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/1/1c/No-Symbol.png")
+		embed.add_field(name="__Besoin d'aide ?__", value="Utilisez la commande **"+self.prefix+"help unban **", inline=False)
 		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		# on ajoute une réaction au message de l'utilisateur
 		await ctx.message.add_reaction("❌")

@@ -3,6 +3,11 @@
 ## [Futur Changement]
 Voir commande -commands du bot
 
+## 2022-02-19
+### Ajout
+- commande ban : Permet de bannir un utilisateur
+- commande unban : Permet de débannir un utilisateur à partir de son id
+
 ## 2022-02-12
 ### Ajout
 - Fichier functions contenu dans le fichier commande, il permet de stocker des fichiers python avec des fonctions utile / création dans ce fichier functions du fichier database.py contenant la fonction create_eco
