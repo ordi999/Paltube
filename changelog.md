@@ -7,6 +7,7 @@ Voir commande -commands du bot
 ### Ajout
 - commande ban : Permet de bannir un utilisateur
 - commande unban : Permet de débannir un utilisateur à partir de son id
+- commande poll : Permet de faire un sondage entre 2 choix / à améliorer
 
 ## 2022-02-12
 ### Ajout

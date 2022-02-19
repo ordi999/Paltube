@@ -1,5 +1,6 @@
 import discord
 from datetime import datetime
+import asyncio
 
 class Autres(discord.ext.commands.Cog):
 	""" Autres commandes """
@@ -99,3 +100,35 @@ class Autres(discord.ext.commands.Cog):
 		# on envoit le embed
 		await ctx.send(embed=embed, delete_after=5)
 		await ctx.message.delete(delay = 2)
+
+	@discord.ext.commands.command(
+	name="poll",
+	brief="Permet de faire un sondage !",
+	help="Permet de faire un sondage !")
+	async def poll(self, ctx,time : int, choice1,choice2,*,topic):
+		embed = discord.Embed(title = topic,description = f":one: {choice1} \n\n:two: {choice2}",color = discord.Colour.random(),timestamp = datetime.utcnow())
+		
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+		embed.set_thumbnail(url=ctx.author.avatar_url)
+
+		message = await ctx.send(embed = embed)
+		await message.add_reaction("1️⃣")
+		await message.add_reaction("2️⃣")
+		
+		await asyncio.sleep(time)
+
+		newmessage = await ctx.fetch_message(message.id)
+		onechoice = await newmessage.reactions[0].users().flatten()
+		secchoice = await newmessage.reactions[1].users().flatten()
+
+		result = "égalité"
+		if len(onechoice) >len(secchoice):
+			result = choice1
+		elif len(onechoice) <len(secchoice):
+			result = choice2
+
+		embed = discord.Embed(title = topic,description = f"résultat : {result}",color = discord.Colour.random())
+		
+		embed.set_footer(text=f"{choice1} || {choice2}")
+
+		await newmessage.edit(embed=embed)

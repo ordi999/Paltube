@@ -36,3 +36,6 @@ class Zone_de_test(discord.ext.commands.Cog):
 			# on envoit le embed
 			await ctx.send(embed=embed, delete_after=10)
 			await ctx.message.delete(delay = 2)
+
+
+	
