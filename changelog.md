@@ -1,8 +1,16 @@
 # Changelog
 
 ## [Futur Changement]
-Voir commande -commands du bot
-
+- Voir commande -commands du bot
+- bug.error / slots.error / poll.error
+- Améliorer la commande poll + utiliser task ?
+- gérer les probas de récompense commande slots
+- envoyer un mp si activé en cas de ban/unban/kick
+- [vidéo pour améliorer le poll](https://www.youtube.com/watch?v=N6HoS7oImFM)
+- gérer les commandes en mp
+- ne pas pouvoir kick des gens avec un role plus haut que soit
+- code roms__ : serveur / mute / nick
+  
 ## 2022-02-19
 ### Ajout
 - commande ban : Permet de bannir un utilisateur

@@ -1,5 +1,5 @@
 import discord
-from datetime import datetime
+from datetime import datetime, timedelta
 import asyncio
 
 class Autres(discord.ext.commands.Cog):
@@ -106,7 +106,7 @@ class Autres(discord.ext.commands.Cog):
 	brief="Permet de faire un sondage !",
 	help="Permet de faire un sondage !")
 	async def poll(self, ctx,time : int, choice1,choice2,*,topic):
-		embed = discord.Embed(title = topic,description = f":one: {choice1} \n\n:two: {choice2}",color = discord.Colour.random(),timestamp = datetime.utcnow())
+		embed = discord.Embed(title = topic,description = f":one: {choice1} \n\n:two: {choice2} \n\nLe sondage dure {time} secondes",color = discord.Colour.random(),timestamp = datetime.utcnow())
 		
 		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 		embed.set_thumbnail(url=ctx.author.avatar_url)
@@ -132,3 +132,16 @@ class Autres(discord.ext.commands.Cog):
 		embed.set_footer(text=f"{choice1} || {choice2}")
 
 		await newmessage.edit(embed=embed)
+
+	@discord.ext.commands.command(
+	name="liens",
+	brief="Permet d'obtenir les liens en rapport avec le bot !",
+	help="Permet d'obtenir les liens en rapport avec le bot !")
+	async def lien(self, ctx):
+		embed = discord.Embed(title = ":link: liens :link:",description="Bot discord ➡️ **[Discord](https://discord.com/api/oauth2/authorize?client_id=935874631364132894&permissions=8&scope=bot)**",color = discord.Colour.random(),timestamp = datetime.utcnow())
+		
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+
+		await ctx.send(embed = embed)
+		await ctx.message.delete()
+		

@@ -116,7 +116,7 @@ get_all_data_activation = True
 reset_user_account_activation = True
 coinflip_activation = True
 reward_activation = True
-slots_activation = False
+slots_activation = True
 
 #Tous les status que vas prendre le bot
 status = cycle([
@@ -147,6 +147,8 @@ async def on_ready():
   
   #on prévient dans la console que le bot a été connecté ainsi que son nom d'utilisateur
   print("Nous avons été connectée en tant que {0.user}".format(bot))
+  restart = bot.get_channel(944894516933046352)
+  await restart.send(f"Le bot vient de redémarer ! | {datetime.utcnow()} UTC")
 
 # Si le changement de status est activé
 if(changement_status_activation):

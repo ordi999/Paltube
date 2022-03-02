@@ -1016,9 +1016,7 @@ class Economy(discord.ext.commands.Cog):
 
 			if balance >= money:
 
-				embed = discord.Embed(title="Slots", description=f"""{random_slots_data[0]} | {random_slots_data[1]} | {random_slots_data[2]}
-				{random_slots_data[3]} | {random_slots_data[4]} | {random_slots_data[5]}
-				{random_slots_data[6]} | {random_slots_data[7]} | {random_slots_data[8]}""",colour=discord.Color.from_rgb(244, 182, 89),timestamp = datetime.utcnow())
+				embed = discord.Embed(title="Slots", description=f" {random_slots_data[0]} | {random_slots_data[1]} | {random_slots_data[2]}\n▶️ {random_slots_data[3]} | {random_slots_data[4]} | {random_slots_data[5]} ◀️\n{random_slots_data[6]} | {random_slots_data[7]} | {random_slots_data[8]}",colour=discord.Color.from_rgb(244, 182, 89),timestamp = datetime.utcnow())
 
 				embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
 
