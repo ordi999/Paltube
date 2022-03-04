@@ -2,7 +2,7 @@
 
 ## [Futur Changement]
 - Voir commande -commands du bot
-- bug.error / slots.error / poll.error
+- bug.error / slots.error / poll.error / serveur.error / lien.error
 - Améliorer la commande poll + utiliser task ?
 - gérer les probas de récompense commande slots
 - envoyer un mp si activé en cas de ban/unban/kick
@@ -10,6 +10,9 @@
 - gérer les commandes en mp
 - ne pas pouvoir kick des gens avec un role plus haut que soit
 - code roms__ : serveur / mute / nick
+- améliorer commande lien/serveur
+- status nombre de serveur automatique / nombre de personne
+- déplacer des commandes dans information.py
   
 ## 2022-02-19
 ### Ajout
@@ -25,6 +28,10 @@
 ### Changement
 - Ajout de l'image de profil dans le footer des embeds
 - gain de la commande daily : 100 + 10 par jour consécutifs
+
+## 2022-03-02
+### Ajout
+- commande serveurs : donne la liste des serveurs sur lequel est le bot / a améliorer
 
 ## 2022-02-08
 ### Ajout

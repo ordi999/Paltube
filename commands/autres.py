@@ -144,4 +144,22 @@ class Autres(discord.ext.commands.Cog):
 
 		await ctx.send(embed = embed)
 		await ctx.message.delete()
-		
+
+	@discord.ext.commands.command(
+	name="serveurs",
+	brief="Permet d'obtenir la liste des serveurs dans lesquel est le bot !",
+	help="Permet d'obtenir la liste des serveurs dans lesquel est le bot !")
+	async def serveurs(self,ctx):
+		activeservers = self.bot.guilds
+		count = 0
+		for guild in activeservers:
+			count += guild.member_count
+		embed = discord.Embed(title = f"Je suis dans **{len(self.bot.guilds)} serveurs !**",description=f"il y a **{count} membres** au totals",color = discord.Colour.random(),timestamp = datetime.utcnow())	  
+		if len(self.bot.guilds) <20:
+			for guild in activeservers:
+				embed.add_field(name=guild.name,value=f"Il y a {guild.member_count} membres dans ce serveur !",inline=False)
+		embed.set_thumbnail(url=self.bot.user.avatar_url)
+		embed.set_footer(text="Commande demandé par : " + ctx.author.display_name, icon_url=ctx.message.author.avatar_url)
+
+		await ctx.send(embed = embed)
+		await ctx.message.delete()
